@@ -1,0 +1,23 @@
+{
+  "name": "admondo",
+  "version": "1.0.0",
+  "description": "אפליקציית פרודוקטיביות עם עוזר AI אישי",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adamash000-design/Admondo-2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adamash000-design/Admondo-2/issues"
+  },
+  "homepage": "https://github.com/adamash000-design/Admondo-2#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0"
+  },
+  "type": "module"
+}
