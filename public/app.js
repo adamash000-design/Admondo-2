@@ -319,7 +319,7 @@ function tick() {
     clearInterval(T.iv); T.endAt = null;
     if (T.mode === "focus") { S.focusLog.push({ date: todayISO(), minutes: S.settings.focus }); save(); }
     try { navigator.vibrate?.(300); } catch {}
-    alert(T.mode === "focus" ? "כל הכבוד! סיימת סשן מיקוד 🎉" : "ההפסקה נגמרה – חוזרים לעבודה 💪");
+    toast(T.mode === "focus" ? "כל הכבוד! סיימת סשן מיקוד 🎉" : "ההפסקה נגמרה – חוזרים לעבודה 💪");
     T.left = modeMins() * 60;
   }
   if (route === "timer") paintTimer();
@@ -413,6 +413,21 @@ function openSheet(html, page = false) {
   sheet.classList.remove("hidden");
 }
 function closeSheet() { sheet.classList.add("hidden"); sheet.innerHTML = ""; }
+
+/* In-app replacements for alert()/confirm() */
+function toast(msg) {
+  let t = $("#toast");
+  if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; t.setAttribute("role", "status"); $(".phone").appendChild(t); }
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2200);
+}
+function ask(msg, okLabel = "אישור") {
+  return new Promise((resolve) => {
+    openSheet(`<p class="ask">${esc(msg)}</p><div class="row"><button class="btn ghost" id="askNo">ביטול</button><button class="btn danger" id="askYes">${esc(okLabel)}</button></div>`);
+    $("#askNo").onclick = () => { closeSheet(); resolve(false); };
+    $("#askYes").onclick = () => { closeSheet(); resolve(true); };
+  });
+}
 sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSheet(); });
 
 function sheetTask() {
@@ -491,12 +506,12 @@ const actions = {
     else S.projects.unshift({ id: uid(), name, icon: pickIcon, progress, status, updatedAt: Date.now() });
     closeSheet();
   },
-  delProject(id) { if (!confirm("למחוק את הפרויקט?")) return false; S.projects = S.projects.filter((p) => p.id !== id); closeSheet(); },
+  delProject(id) { ask("למחוק את הפרויקט?", "מחק").then((ok) => { if (!ok) return; S.projects = S.projects.filter((p) => p.id !== id); save(); render(); }); return false; },
   saveIdea() { const text = $("#iText").value.trim(); if (!text) return false; S.ideas.unshift({ id: uid(), text, createdAt: Date.now() }); closeSheet(); },
   delIdea(id) { S.ideas = S.ideas.filter((i) => i.id !== id); },
   forget(id) { S.memory = S.memory.filter((m) => m.id !== id); },
-  clearChat() { if (!confirm("לנקות את היסטוריית השיחה? (הזיכרון לטווח ארוך יישמר)")) return false; S.chat = []; },
-  resetAll() { if (!confirm("לאפס את כל הנתונים?")) return false; S = seed(); },
+  clearChat() { ask("לנקות את היסטוריית השיחה? הזיכרון לטווח ארוך יישמר.", "נקה").then((ok) => { if (!ok) return; S.chat = []; save(); toast("השיחה נוקתה"); }); return false; },
+  resetAll() { ask("לאפס את כל הנתונים? אי אפשר לבטל את זה.", "אפס").then((ok) => { if (!ok) return; S = seed(); save(); render(); toast("הנתונים אופסו"); }); return false; },
   saveSettings() {
     S.user.name = $("#sName").value.trim() || S.user.name;
     S.user.avatar = $("#sAvatar").value.trim() || S.user.avatar;
@@ -504,7 +519,7 @@ const actions = {
     S.settings.short = Math.max(1, +$("#sShort").value || 5);
     S.settings.long = Math.max(1, +$("#sLong").value || 15);
     if (!T.endAt) T.left = null;
-    alert("נשמר ✓");
+    toast("נשמר ✓");
   },
   suggest(_, el) { sendMsg(el.textContent); return false; },
   tToggle() {
@@ -533,8 +548,9 @@ document.addEventListener("click", (e) => {
   if (segBtn) {
     const name = segBtn.closest("[data-seg]").dataset.seg;
     if (name === "timer") {
-      if (T.endAt && !confirm("להחליף מצב ולעצור את הטיימר?")) return;
-      clearInterval(T.iv); T.endAt = null; T.mode = segBtn.dataset.val; T.left = modeMins() * 60;
+      const switchMode = () => { clearInterval(T.iv); T.endAt = null; T.mode = segBtn.dataset.val; T.left = modeMins() * 60; render(); };
+      if (T.endAt) { ask("להחליף מצב ולעצור את הטיימר?", "החלף").then((ok) => ok && switchMode()); return; }
+      return switchMode();
     } else tabState[name] = segBtn.dataset.val;
     return render();
   }
