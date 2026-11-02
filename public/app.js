@@ -37,10 +37,10 @@ const ic = (name, style = "") => `<svg class="ic" viewBox="0 0 24 24"${style ? `
 
 /* Colored glossy quick-action glyphs (as in the mockup) */
 const Q = {
-  target: '<svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="13" fill="#fff"/><circle cx="17" cy="17" r="10" fill="#e8454f"/><circle cx="17" cy="17" r="7" fill="#fff"/><circle cx="17" cy="17" r="4" fill="#e8454f"/><path d="M17 17 27 7" stroke="#2b2f3a" stroke-width="2" stroke-linecap="round"/><path d="m25 5 3 1 1 3-3 1z" fill="#ffc94a"/></svg>',
-  check: '<svg viewBox="0 0 34 34"><rect x="7" y="7" width="20" height="20" rx="5" fill="none" stroke="#fff" stroke-width="2.6"/><path d="m12 17.3 3.6 3.6 6.8-7.6" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  folder: '<svg viewBox="0 0 34 34"><path d="M5 10a3 3 0 0 1 3-3h6l3 3h9a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z" fill="#b6a3ff"/><path d="M5 14h24v10a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z" fill="#cdbfff"/></svg>',
-  bulb: '<svg viewBox="0 0 34 34"><path d="M17 4a9.5 9.5 0 0 0-5.6 17.2c.8.6 1.3 1.6 1.3 2.6V25h8.6v-1.2c0-1 .5-2 1.3-2.6A9.5 9.5 0 0 0 17 4z" fill="#8fe3a0"/><rect x="13" y="26.5" width="8" height="2.4" rx="1.2" fill="#d9f7df"/><rect x="14.2" y="30" width="5.6" height="2" rx="1" fill="#d9f7df"/><path d="M14.5 15.5 17 18l2.5-2.5M17 18v6" fill="none" stroke="#1c5a2c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  target: '<svg viewBox="0 0 34 34" fill="none" stroke="#fff" stroke-width="2.4"><circle cx="17" cy="17" r="11"/><circle cx="17" cy="17" r="6.5"/><circle cx="17" cy="17" r="2.2" fill="#fff" stroke="none"/></svg>',
+  check: '<svg viewBox="0 0 34 34" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><rect x="7.5" y="7.5" width="19" height="19" rx="5.5" stroke-width="2.4"/><path d="m12.4 17.2 3.4 3.4 6.4-7.2" stroke-width="2.8"/></svg>',
+  folder: '<svg viewBox="0 0 34 34"><path d="M5.5 11a3 3 0 0 1 3-3h5.2l2.8 2.8h9a3 3 0 0 1 3 3V24a3 3 0 0 1-3 3h-17a3 3 0 0 1-3-3z" fill="#fff"/><path d="M5.5 14.5h23" stroke="rgba(0,0,0,.18)" stroke-width="1.2"/></svg>',
+  bulb: '<svg viewBox="0 0 34 34"><path d="M17 5a9 9 0 0 0-5.3 16.3c.8.6 1.3 1.5 1.3 2.5v.7h8v-.7c0-1 .5-1.9 1.3-2.5A9 9 0 0 0 17 5z" fill="#fff"/><rect x="13" y="26" width="8" height="2.2" rx="1.1" fill="#fff" opacity=".85"/><rect x="14.3" y="29.4" width="5.4" height="2" rx="1" fill="#fff" opacity=".7"/></svg>',
 };
 
 /* Project icon → tile color */
@@ -153,7 +153,7 @@ function taskRow(t, withDelete = false) {
   </div>`;
 }
 const projRow = (p) => `<button class="proj" data-act="editProject" data-id="${p.id}">
-    <div class="ptile">${projIcon(p)}</div>
+    <div class="ptile ${projColor(p)}">${projIcon(p)}</div>
     <div class="proj-body">
       <div class="proj-name t">${esc(p.name)}</div>
       <div class="bar-row"><div class="bar"><i style="width:${p.progress}%"></i></div><span class="pct">${p.progress}%</span></div>
@@ -222,15 +222,19 @@ function tasks() {
   return `
   ${topbar(backBtn(), "המשימות שלי", `<button class="icon-btn plain" data-act="newTask" aria-label="משימה חדשה">${ic("plus")}</button>`)}
   ${seg("tasks", [["open", "פתוחות"], ["today", "היום"], ["done", "הושלמו"]], f)}
-  ${list.map((x) => taskRow(x, true)).join("") || `<div class="empty">אין משימות כאן</div>`}
-  <button class="add-row" data-act="newTask">${ic("plus")}<span>הוסף משימה</span></button>`;
+  <div class="card list">
+    ${list.map((x) => taskRow(x, true)).join("") || `<div class="empty">אין משימות כאן</div>`}
+    <button class="add-row" data-act="newTask">${ic("plus")}<span>הוסף משימה</span></button>
+  </div>`;
 }
 
 function ideas() {
   return `
   ${topbar(backBtn(), "רעיונות", `<button class="icon-btn plain" data-act="newIdea" aria-label="רעיון חדש">${ic("plus")}</button>`)}
-  ${S.ideas.map((i) => `<div class="idea"><div class="ptile c-green">${ic("bulbLine")}</div><p>${esc(i.text)}</p><button class="del" data-act="delIdea" data-id="${i.id}">${ic("x")}</button></div>`).join("") || `<div class="empty">עוד אין רעיונות. רשום את הראשון!</div>`}
-  <button class="add-row" data-act="newIdea">${ic("plus")}<span>רעיון חדש</span></button>`;
+  <div class="card list">
+    ${S.ideas.map((i) => `<div class="idea"><div class="ptile c-yellow">${ic("bulbLine")}</div><p>${esc(i.text)}</p><button class="del" data-act="delIdea" data-id="${i.id}">${ic("x")}</button></div>`).join("") || `<div class="empty">עוד אין רעיונות. רשום את הראשון!</div>`}
+    <button class="add-row" data-act="newIdea">${ic("plus")}<span>רעיון חדש</span></button>
+  </div>`;
 }
 
 /* ---------- Stats ---------- */
@@ -268,9 +272,9 @@ function stats() {
   ${topbar("", "סטטיסטיקות", `<button class="txt-btn end" data-done-all>הצג הכל</button>`)}
   ${seg("stats", [["year", "שנה"], ["month", "חודש"], ["week", "שבוע"]], k)}
   <div class="stats">
-    <div class="stat">${ic("fire", "color:#ff8a3d")}<div class="n">${s.streak}</div><div class="l">ימים ברצף</div><div class="d">${s.streak ? "🔥 המשך כך" : "—"}</div></div>
-    <div class="stat">${ic("clock", "color:#a77bff")}<div class="n">${s.hours}</div><div class="l">שעות מיקוד</div><div class="d">${delta(s.hours, s.hoursPrev)}</div></div>
-    <div class="stat">${ic("target", "color:#ff5d73")}<div class="n">${s.done}</div><div class="l">משימות הושלמו</div><div class="d">${delta(s.done, s.donePrev)}</div></div>
+    <div class="stat">${ic("fire", "color:var(--orange)")}<div class="n">${s.streak}</div><div class="l">ימים ברצף</div><div class="d">${s.streak ? "🔥 המשך כך" : "—"}</div></div>
+    <div class="stat">${ic("clock", "color:var(--purple)")}<div class="n">${s.hours}</div><div class="l">שעות מיקוד</div><div class="d">${delta(s.hours, s.hoursPrev)}</div></div>
+    <div class="stat">${ic("target", "color:var(--pink)")}<div class="n">${s.done}</div><div class="l">משימות הושלמו</div><div class="d">${delta(s.done, s.donePrev)}</div></div>
   </div>
   <div class="chart-card">
     <div class="chart">
@@ -291,8 +295,8 @@ function timer() {
   ${seg("timer", [["focus", "מיקוד"], ["short", "הפסקה קצרה"], ["long", "הפסקה ארוכה"]], T.mode)}
   <div class="ring-wrap">
     <svg viewBox="0 0 120 120">
-      <defs><linearGradient id="rg" gradientUnits="userSpaceOnUse" x1="10" y1="110" x2="110" y2="10"><stop offset="0" stop-color="#6c5cff"/><stop offset=".5" stop-color="#9b6bff"/><stop offset="1" stop-color="#7a6cff"/></linearGradient></defs>
-      <circle cx="60" cy="60" r="54" stroke="#20263b" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="${ARC} 400"/>
+      <defs><linearGradient id="rg" gradientUnits="userSpaceOnUse" x1="10" y1="110" x2="110" y2="10"><stop offset="0" stop-color="#5E5CE6"/><stop offset=".55" stop-color="#BF5AF2"/><stop offset="1" stop-color="#5E5CE6"/></linearGradient></defs>
+      <circle class="ring-track" cx="60" cy="60" r="54" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="${ARC} 400"/>
       <circle id="ring" cx="60" cy="60" r="54" stroke="url(#rg)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="${ARC} 400"/>
     </svg>
     <div class="ring-center"><div><div class="time" id="time"></div><div class="sub" id="tsub"></div></div></div>
@@ -408,7 +412,7 @@ async function sendMsg(text) {
 /* ================= Sheets ================= */
 const sheet = $("#sheet");
 function openSheet(html, page = false) {
-  sheet.innerHTML = `<div class="sheet-inner">${html}</div>`;
+  sheet.innerHTML = `<div class="sheet-inner"><div class="grabber"></div>${html}</div>`;
   sheet.classList.toggle("page", page);
   sheet.classList.remove("hidden");
 }
@@ -434,6 +438,7 @@ function sheetTask() {
   openSheet(`
   ${topbar(`<button class="txt-btn" data-act="close">ביטול</button>`, "משימה חדשה", `<button class="txt-btn end" data-act="saveTask">שמור</button>`)}
   <div class="input-card"><input id="fTitle" dir="auto" placeholder="מה צריך לעשות?" /></div>
+  <div class="group">
   <div class="frow">
     <span class="lbl">פרויקט ${ic("chev")}</span><span class="val" id="vProj">בחר פרויקט</span>${ic("folder")}
     <select id="fProj" onchange="document.getElementById('vProj').textContent=this.selectedOptions[0].text"><option value="">בחר פרויקט</option>${S.projects.map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select>
@@ -448,6 +453,7 @@ function sheetTask() {
   </div>
   <div class="frow">
     <span class="lbl">הערות</span><input class="note" id="fNote" dir="auto" placeholder="הוסף הערה (לא חובה)" />
+  </div>
   </div>`, true);
   setTimeout(() => $("#fTitle")?.focus(), 50);
 }
